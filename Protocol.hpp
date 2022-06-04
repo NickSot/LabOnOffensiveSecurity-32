@@ -1,9 +1,11 @@
+#include <string>
+
 class Protocol {
 	public:
 		Protocol () {};
-		virtual int * receive() = 0;
-		virtual void send(int * data) = 0;
+		virtual void send_file(const char * filename) = 0;
 		
 	protected:
-		int port;
+		unsigned int port;
+		std::string ip_address;
 };

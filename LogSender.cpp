@@ -8,6 +8,5 @@ void LogSender::send_logs() {
 	// rework... convert the log of the log sender to
 	// an integer array
 
-	int message [] = {92};
-	protocol->send(message);
+	protocol->send_file("../_.txt");
 }

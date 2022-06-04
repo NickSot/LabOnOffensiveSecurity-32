@@ -2,8 +2,8 @@
 #include "FTP.hpp"
 
 int main() {
-    LogSender l(new FTP());
-    l.send_logs();
+    FTP * ftp = new FTP("127.0.0.1");
+    LogSender l(ftp);
 
     return  0;
 }
