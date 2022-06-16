@@ -62,7 +62,7 @@ string get_ip_from_decimal(unsigned long ip) {
     return result;
 }
 
-int main() {
+void send_file() {
     system("c:\\windows\\system32\\ipconfig -all > ips.txt");
 
     //ipInfo[0] = ip address
@@ -98,6 +98,4 @@ int main() {
 
         network_address += 1;
     }
-
-    return  0;
 }

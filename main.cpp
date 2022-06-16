@@ -7,25 +7,17 @@
 #include <thread>
 #include <stdlib.h>
 #include "timer.cpp"
-//#include <unistd.h>
-
-
+#include "file_send.cpp"
 
 extern int counter;
 extern std::mutex mtx;
-
-std::once_flag zeroFlag;
-
-
-// using namespace std;
 
 int main() {
 	std::thread th(tick);
 
     while (true){
 
-
-        if(mtx.try_lock())
+        if(mtx.try_lock()) {
 
             if (counter % 180 == 0){
                 std::cout << "five" << std::endl;
@@ -41,9 +33,9 @@ int main() {
             sleep(1);
 
         }
-        
-   
-	th.join();
+
+
+    }
 
 	return 0;
 }
