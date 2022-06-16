@@ -8,6 +8,7 @@
 
 extern int counter;
 extern std::mutex mtx;
+extern bool ready;
 
 ofstream out;
 
@@ -25,7 +26,7 @@ string read_file(string filename) {
 
         f.close();
     }
-    
+
     return text;
 }
 
@@ -36,8 +37,8 @@ int main() {
     string filename = "./keys.txt";
 
     while (true){
-        if(mtx.try_lock()) {
-            if (counter % 4 == 0){
+        if(ready && mtx.try_lock()) {
+            if (counter % 10 == 0){
                 
                 string text = read_file(filename);
 
@@ -54,20 +55,22 @@ int main() {
                 }
 
                 fclose(fopen(filename.c_str(), "w"));
-                buffer = "";
 
+                cout << buffer << endl;
+                buffer = "";
             }
 
-            else if (counter % 2 == 0){
+            else if (counter % 5 == 0){
                 buffer += 'a';
+
                 out.open(filename, std::ios_base::app);
                 out << buffer;
                 out.close();
             }
 
-            mtx.unlock();
+            ready = false;
 
-            sleep(1);
+            mtx.unlock();
         }
     }
 

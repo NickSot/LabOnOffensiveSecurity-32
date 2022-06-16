@@ -6,22 +6,23 @@
 #include <unistd.h>
 
 int counter = 1;
-int prev_count;
 std::mutex mtx;
+
+bool ready = false;
 
 void tick() {
 	while (true) {
 		if (counter > 180) 
-			counter = 0;
-
+			counter = 1;
+		
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 
         mtx.lock();
         
-        std::cout << counter << std::endl;
-        prev_count = counter;
-		
+        cout << counter << endl;
 		counter++;
+
+		ready = true;
 
         mtx.unlock();
 	}
