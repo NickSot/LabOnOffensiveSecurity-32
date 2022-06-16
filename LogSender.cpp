@@ -24,13 +24,7 @@ void LogSender::send_logs(const char * filename) {
 		f.close();
 	}
 
-	// int iTimeout = 1;
- //    int iRet = setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (const char *)&iTimeout, sizeof(iTimeout) );
- //    cout << iRet << endl;
-
 	int result = connect(sock, (sockaddr *)addr, sizeof(sockaddr));
-	
-	cout << "error" << endl;
 
 	if (result == -1) {
 		return;
