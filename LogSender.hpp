@@ -2,16 +2,22 @@
 #define LOG_SENDER_H
 
 #include <string>
-#include "Protocol.hpp"
+#include <fstream>
+#include <winsock2.h>
+#include <WS2tcpip.h>
+
+//comment later
+#include <iostream>
 
 class LogSender {
 	public:
-		LogSender(Protocol * protocol);
+		LogSender(sockaddr_in * pAddr);
 		void send_logs(const char * filename);
 
 	private:
-		Protocol * protocol;
-		std::string text;
+		SOCKET sock;
+		sockaddr_in * addr;
+		std::string text = "";
 };
 
 #endif
