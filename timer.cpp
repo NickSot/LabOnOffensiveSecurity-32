@@ -1,4 +1,4 @@
-#include <windows.h>
+// #include <windows.h>
 #include <thread>
 #include <iostream>
 #include <chrono>
@@ -11,6 +11,9 @@ std::mutex mtx;
 
 void tick() {
 	while (true) {
+		if (counter > 180) 
+			counter = 0;
+
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 
         mtx.lock();

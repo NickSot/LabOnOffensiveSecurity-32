@@ -21,7 +21,7 @@ int main() {
 	sockaddr_in addr;
 
 	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = inet_addr("10.10.40.188");
+	addr.sin_addr.s_addr = inet_addr("192.168.1.50");
 	addr.sin_port = htons(5000);
 	
 	int bind_result = bind(sock, (sockaddr *)&addr, sizeof(addr));
@@ -38,7 +38,8 @@ int main() {
 		
 		int result = recv(newconn, buffer, 1024, 0);
 
-		cout << buffer << endl;
+		if (result > 0)
+			cout << buffer << endl;
 	}
 
 	return 0;

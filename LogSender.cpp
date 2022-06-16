@@ -4,33 +4,23 @@ using namespace std;
 
 LogSender::LogSender(sockaddr_in * pAddr) {
 	addr = pAddr;
-	this->sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 }
 
-void LogSender::send_logs(const char * filename) {
+SOCKET LogSender::send_logs() {
 	WSADATA wsaData;
 
     int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 
-	ifstream f;
+	SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
 
-	f.open(filename);
+	u_long block_mode = 1;
 
-	if (f.is_open()) {
-		while (getline(f, text)) {
-			
-		}
+	int flag_result = ioctlsocket(sock, FIONBIO, &block_mode);
 
-		f.close();
-	}
+	if (flag_result != NO_ERROR)
+		cout << "fucking error" << endl;
 
-	int result = connect(sock, (sockaddr *)addr, sizeof(sockaddr));
+	connect(sock, (sockaddr *)addr, sizeof(sockaddr));
 
-	if (result == -1) {
-		return;
-	}
-
-	int send_result = send(sock, text.c_str(), strlen(text.c_str()), 0);
-
-	result = closesocket(sock);
+	return sock;
 }
