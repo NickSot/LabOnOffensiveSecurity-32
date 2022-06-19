@@ -21,7 +21,7 @@ int main() {
 	sockaddr_in addr;
 
 	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = inet_addr("192.168.1.50");
+	addr.sin_addr.s_addr = inet_addr("131.155.222.2");
 	addr.sin_port = htons(5000);
 	
 	int bind_result = bind(sock, (sockaddr *)&addr, sizeof(addr));

@@ -12,8 +12,8 @@
 
 class LogSender {
 	public:
-		LogSender(sockaddr_in * pAddr);
-		SOCKET send_logs();
+		LogSender();
+		SOCKET send_logs(sockaddr_in * pAddr);
 
 	private:
 		sockaddr_in * addr;

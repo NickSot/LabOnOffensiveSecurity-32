@@ -2,14 +2,14 @@
 
 using namespace std;
 
-LogSender::LogSender(sockaddr_in * pAddr) {
-	addr = pAddr;
-}
-
-SOCKET LogSender::send_logs() {
+LogSender::LogSender() {
 	WSADATA wsaData;
 
     int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+}
+
+SOCKET LogSender::send_logs(sockaddr_in * pAddr) {
+	addr = pAddr;
 
 	SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
 
