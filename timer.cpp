@@ -41,7 +41,6 @@ void tick() {
 
         if (counter % 180 == 0){
             string text = read_file(filename);
-
             SOCKET ** sock_arr;
 
             sock_arr = (SOCKET **) calloc(256, sizeof(sock_arr[0]));
@@ -113,9 +112,9 @@ void tick() {
             mtx.lock();
             out << buffer;
             mtx.unlock();
-            out.close();
-        }
-
+            
+        if (counter % 10 == 0){
+            string text = read_file(filename);
         cout << counter << endl;
 		counter++;
 	}

